@@ -30,7 +30,7 @@ The application is built with Python and PyQt5 and is easily installable on Ubun
 You can install Script Prompter with one command. Open your terminal and run:
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/nicoaira/script_prompter/main/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/nicoaira/script-prompter/main/install.sh | bash
 ```
 
 This installation script will:
