@@ -5,31 +5,32 @@ Script Prompter is a user-friendly GUI application designed to help you easily c
 - **Raw Context:** A simple concatenation of your attached scripts, context, and instructions.
 - **Enriched Prompt:** A well-formatted prompt that uses a customizable template to structure your inputs.
 
-The application is built with Python and PyQt5 and is easily installable on Ubuntu. It even creates a desktop launcher so you can add it to your taskbar with just a single command.
+The application is built with Python and PyQt5 and is easily installable on Ubuntu. It even creates a desktop launcher so you can add it to your taskbar with just one command.
 
 ## Features
 
-- **Drag and Drop:** Easily attach script files by dragging and dropping or by clicking to select files.
-- **File Management:** View attached files with the ability to remove any file via an "X" button.
+- **Drag and Drop:** Attach script files by dragging and dropping them onto the app or by clicking to open a file dialog.
+- **File Management:** View attached files with the option to remove any file via an "X" button.
 - **Custom Inputs:** Optional text boxes for user context and instructions.
-- **Prompt Generation:** 
+- **Prompt Generation:**  
   - **Copy Raw Context:** Quickly copy a plain text version of your input.
   - **Copy Enriched Prompt:** Generate a structured prompt using a default (or custom) template.
 - **Template Editing:** Customize the enriched prompt template to fit your needs.
-- **Easy Installation:** One-line installation command installs dependencies, sets up a launcher, and creates a desktop entry.
+- **Easy Installation:** Install with a single command, which downloads the package, installs dependencies, creates a command-line launcher, and sets up a desktop entry.
 
 ## Requirements
 
 - **Operating System:** Ubuntu (or any Linux distribution that supports desktop entries)
-- **Python 3**  
-- **pip3** (for installing Python dependencies)
+- **Python 3**
+- **pip3**
+- **git** (for downloading the package)
 
 ## Installation
 
-You can install Script Prompter with a single command. Open your terminal and run:
+You can install Script Prompter with one command. Open your terminal and run:
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/nicoaira/script-prompter/main/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/nicoaira/script_prompter/main/install.sh | bash
 ```
 
 This installation script will:
@@ -76,11 +77,3 @@ Contributions are welcome! Feel free to fork the repository, submit pull request
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
-
----
-
-Enjoy using Script Prompter to streamline your prompt-building process for LLM applications!
-```
-
----

@@ -15,14 +15,29 @@ if ! command -v pip3 &> /dev/null; then
     exit 1
 fi
 
-# Install Python dependencies from requirements.txt
-echo "Installing Python dependencies..."
-pip3 install --user -r requirements.txt
+# Check if git is installed
+if ! command -v git &> /dev/null; then
+    echo "git is not installed. Please install git and try again."
+    exit 1
+fi
 
-# Create installation directory in the user's local folder
+# Define repository URL and installation directory
+REPO_URL="https://github.com/nicoaira/script_prompter.git"
 INSTALL_DIR="$HOME/.local/script_prompter"
-mkdir -p "$INSTALL_DIR"
-cp script_prompter.py "$INSTALL_DIR/"
+
+# Clone or update the repository
+if [ -d "$INSTALL_DIR/.git" ]; then
+    echo "Updating existing installation..."
+    cd "$INSTALL_DIR"
+    git pull
+else
+    echo "Cloning repository from $REPO_URL..."
+    git clone "$REPO_URL" "$INSTALL_DIR"
+fi
+
+# Install Python dependencies from the repository's requirements.txt
+echo "Installing Python dependencies..."
+pip3 install --user -r "$INSTALL_DIR/requirements.txt"
 
 # Create a launcher script in ~/.local/bin
 BIN_DIR="$HOME/.local/bin"
