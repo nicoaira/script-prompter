@@ -114,7 +114,7 @@ class TemplateDialog(QDialog):
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("LLM Context Builder")
+        self.setWindowTitle("Script Prompter")
         self.resize(600, 700)
 
         # Dictionary to store attached files: filename -> content.

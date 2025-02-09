@@ -1,6 +1,6 @@
-# LLM Context Builder
+# Script Prompter
 
-LLM Context Builder is a user-friendly GUI application designed to help you easily construct enriched prompts for large language models (LLMs). With its intuitive drag-and-drop interface, you can attach script files, add custom context and instructions, and generate two versions of your prompt:
+Script Prompter is a user-friendly GUI application designed to help you easily construct enriched prompts for large language models (LLMs). With its intuitive drag-and-drop interface, you can attach script files, add custom context and instructions, and generate two versions of your prompt:
 
 - **Raw Context:** A simple concatenation of your attached scripts, context, and instructions.
 - **Enriched Prompt:** A well-formatted prompt that uses a customizable template to structure your inputs.
@@ -26,16 +26,16 @@ The application is built with Python and PyQt5 and is easily installable on Ubun
 
 ## Installation
 
-You can install LLM Context Builder with a single command. Open your terminal and run:
+You can install Script Prompter with a single command. Open your terminal and run:
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/nicoaira/llm-context-builder/main/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/nicoaira/script-prompter/main/install.sh | bash
 ```
 
 This installation script will:
 1. **Install Python dependencies:** Uses pip3 to install PyQt5 (and any other dependencies listed in `requirements.txt`).
-2. **Copy the Application:** Places the main Python script in `~/.local/llm_context_builder/`.
-3. **Create a Launcher:** Generates a launcher script in `~/.local/bin/` so you can run the app with the command `llm_context_builder`.
+2. **Copy the Application:** Places the main Python script in `~/.local/script_prompter/`.
+3. **Create a Launcher:** Generates a launcher script in `~/.local/bin/` so you can run the app with the command `script_prompter`.
 4. **Desktop Entry:** Creates a `.desktop` file in `~/.local/share/applications/` so that the application appears in your system's applications menu. You can then add it to your taskbar by right-clicking the icon and selecting “Add to Favorites” or “Lock to Launcher.”
 
 > **Note:** Ensure that `~/.local/bin` is included in your system’s PATH. Recent Ubuntu installations include this by default.
@@ -46,10 +46,10 @@ Once installed, you can launch the application in two ways:
 - **From the Terminal:**  
   Run the command:
   ```bash
-  llm_context_builder
+  script_prompter
   ```
 - **From the Applications Menu:**  
-  Look for **LLM Context Builder** in your system’s applications. You can then pin it to your taskbar or favorites.
+  Look for **Script Prompter** in your system’s applications. You can then pin it to your taskbar or favorites.
 
 ### How to Use the App
 
@@ -80,7 +80,7 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ---
 
-Enjoy using LLM Context Builder to streamline your prompt-building process for LLM applications!
+Enjoy using Script Prompter to streamline your prompt-building process for LLM applications!
 ```
 
 ---

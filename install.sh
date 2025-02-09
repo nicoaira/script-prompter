@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-echo "Starting installation of LLM Context Builder..."
+echo "Starting installation of Script Prompter..."
 
 # Check if python3 is installed
 if ! command -v python3 &> /dev/null; then
@@ -20,27 +20,27 @@ echo "Installing Python dependencies..."
 pip3 install --user -r requirements.txt
 
 # Create installation directory in the user's local folder
-INSTALL_DIR="$HOME/.local/llm_context_builder"
+INSTALL_DIR="$HOME/.local/script_prompter"
 mkdir -p "$INSTALL_DIR"
-cp llm_context_builder.py "$INSTALL_DIR/"
+cp script_prompter.py "$INSTALL_DIR/"
 
 # Create a launcher script in ~/.local/bin
 BIN_DIR="$HOME/.local/bin"
 mkdir -p "$BIN_DIR"
-LAUNCHER="$BIN_DIR/llm_context_builder"
+LAUNCHER="$BIN_DIR/script_prompter"
 cat > "$LAUNCHER" <<EOF
 #!/bin/bash
-python3 "$INSTALL_DIR/llm_context_builder.py"
+python3 "$INSTALL_DIR/script_prompter.py"
 EOF
 chmod +x "$LAUNCHER"
 echo "Launcher created at $LAUNCHER"
 
 # Create .desktop file in ~/.local/share/applications
-DESKTOP_FILE="$HOME/.local/share/applications/llm_context_builder.desktop"
+DESKTOP_FILE="$HOME/.local/share/applications/script_prompter.desktop"
 mkdir -p "$(dirname "$DESKTOP_FILE")"
 cat > "$DESKTOP_FILE" <<EOF
 [Desktop Entry]
-Name=LLM Context Builder
+Name=Script Prompter
 Exec=$LAUNCHER
 Icon=utilities-terminal
 Type=Application
@@ -50,4 +50,4 @@ EOF
 echo ".desktop file created at $DESKTOP_FILE"
 
 echo "Installation complete!"
-echo "You can launch LLM Context Builder from your applications menu or by running 'llm_context_builder' in a terminal."
+echo "You can launch Script Prompter from your applications menu or by running 'script_prompter' in a terminal."
