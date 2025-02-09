@@ -22,7 +22,7 @@ if ! command -v git &> /dev/null; then
 fi
 
 # Define repository URL and installation directory
-REPO_URL="https://github.com/nicoaira/script_prompter.git"
+REPO_URL="https://github.com/nicoaira/script-prompter.git"
 INSTALL_DIR="$HOME/.local/script_prompter"
 
 # Clone or update the repository
