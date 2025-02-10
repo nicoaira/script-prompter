@@ -42,7 +42,7 @@ cat > "$DESKTOP_FILE" <<EOF
 [Desktop Entry]
 Name=Script Prompter
 Exec=$LAUNCHER
-Icon=$INSTALL_DIR/logo.png
+Icon=$INSTALL_DIR/icon.png
 Type=Application
 Terminal=false
 Categories=Utility;
