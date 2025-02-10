@@ -45,6 +45,8 @@ mkdir -p "$BIN_DIR"
 LAUNCHER="$BIN_DIR/script_prompter"
 cat > "$LAUNCHER" <<EOF
 #!/bin/bash
+# Ensure user site packages are in PYTHONPATH so PyQt5 can be found
+export PYTHONPATH="\$PYTHONPATH:$(python3 -m site --user-site)"
 python3 "$INSTALL_DIR/script_prompter.py"
 EOF
 chmod +x "$LAUNCHER"
