@@ -21,6 +21,9 @@ if ! command -v git &> /dev/null; then
     exit 1
 fi
 
+# Determine the current python3 binary (works with conda or system python)
+PYTHON_BIN=$(which python3)
+
 # Define repository URL and installation directory
 REPO_URL="https://github.com/nicoaira/script-prompter.git"
 INSTALL_DIR="$HOME/.local/share/script-prompter"
@@ -45,9 +48,10 @@ mkdir -p "$BIN_DIR"
 LAUNCHER="$BIN_DIR/script_prompter"
 cat > "$LAUNCHER" <<EOF
 #!/bin/bash
-# Ensure user site packages are in PYTHONPATH so PyQt5 can be found
-export PYTHONPATH="\$PYTHONPATH:$(python3 -m site --user-site)"
-python3 "$INSTALL_DIR/script_prompter.py"
+# Add the user site-packages directory to PYTHONPATH so PyQt5 can be found
+export PYTHONPATH="\$PYTHONPATH:$($PYTHON_BIN -m site --user-site)"
+# Launch the application using the determined python3 interpreter
+"$PYTHON_BIN" "$INSTALL_DIR/script_prompter.py"
 EOF
 chmod +x "$LAUNCHER"
 echo "Launcher created at $LAUNCHER"
