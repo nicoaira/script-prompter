@@ -124,9 +124,8 @@ class MainWindow(QMainWindow):
 
         # Default enriched prompt template.
         self.template = (
-            "## Enriched Prompt\n\n"
             "### Scripts\n{scripts}\n\n"
-            "### User Context\n{context}\n\n"
+            "### Context\n{context}\n\n"
             "### Instructions\n{instructions}\n"
         )
 
