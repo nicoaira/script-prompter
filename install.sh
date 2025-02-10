@@ -3,8 +3,23 @@ set -e
 
 echo "Starting installation of Script Prompter..."
 
-# Check if python3, pip3, and git are installed (omitted here for brevity)
-# ...
+# Check if python3 is installed
+if ! command -v python3 &> /dev/null; then
+    echo "Python3 is not installed. Please install Python3 and try again."
+    exit 1
+fi
+
+# Check if pip3 is installed
+if ! command -v pip3 &> /dev/null; then
+    echo "pip3 is not installed. Please install pip3 and try again."
+    exit 1
+fi
+
+# Check if git is installed
+if ! command -v git &> /dev/null; then
+    echo "git is not installed. Please install git and try again."
+    exit 1
+fi
 
 # Define repository URL and installation directory
 REPO_URL="https://github.com/nicoaira/script-prompter.git"
@@ -30,12 +45,12 @@ mkdir -p "$BIN_DIR"
 LAUNCHER="$BIN_DIR/script_prompter"
 cat > "$LAUNCHER" <<EOF
 #!/bin/bash
-python3 "$INSTALL_DIR/script_prompter.py"
+python3 "$INSTALL_DIR/script-prompter.py"
 EOF
 chmod +x "$LAUNCHER"
 echo "Launcher created at $LAUNCHER"
 
-# Create .desktop file in ~/.local/share/applications with the correct icon path
+# Create .desktop file in ~/.local/share/applications
 DESKTOP_FILE="$HOME/.local/share/applications/script_prompter.desktop"
 mkdir -p "$(dirname "$DESKTOP_FILE")"
 cat > "$DESKTOP_FILE" <<EOF
