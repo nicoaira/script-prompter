@@ -45,7 +45,7 @@ mkdir -p "$BIN_DIR"
 LAUNCHER="$BIN_DIR/script_prompter"
 cat > "$LAUNCHER" <<EOF
 #!/bin/bash
-python3 "$INSTALL_DIR/script-prompter.py"
+python3 "$INSTALL_DIR/script_prompter.py"
 EOF
 chmod +x "$LAUNCHER"
 echo "Launcher created at $LAUNCHER"
