@@ -8,7 +8,7 @@ echo "Starting installation of Script Prompter..."
 
 # Define repository URL and installation directory
 REPO_URL="https://github.com/nicoaira/script-prompter.git"
-INSTALL_DIR="$HOME/.local/script_prompter"
+INSTALL_DIR="$HOME/.local/script-prompter"
 
 # Clone or update the repository
 if [ -d "$INSTALL_DIR/.git" ]; then
