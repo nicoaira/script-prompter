@@ -2,11 +2,11 @@
 
 Script Prompter is a user-friendly GUI application designed to help you easily construct enriched prompts for large language models (LLMs). With its intuitive drag-and-drop interface, you can attach script files, add custom context and instructions, and generate a well-formatted prompt.
 
-![Screenshot from 2025-05-22 17-02-48](https://github.com/user-attachments/assets/69408412-d2f0-4038-afd8-8ba61ffba1b1)
+![image](https://github.com/user-attachments/assets/50e21940-9516-4067-b21b-c04053fb2fe8)
 
 ## Features
 
-- **Drag and Drop / Click to Add:** Attach script files by dragging and dropping them onto the app or by clicking to open a file dialog.
+- **Drag and Drop / Click to Add:** Attach script files by dragging and dropping them onto the app or by clicking to open a file dialog. You can even drag the files from the VS Code explorer!
 - **File Management:** View attached files with the option to remove any file via an "X" button.
 - **Custom Inputs:** Optional text boxes for user-provided context and specific instructions.
 - **Line Numbering:** Optionally prepend line numbers to each line of the attached scripts for easy reference in your prompts.
