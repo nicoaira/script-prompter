@@ -3,7 +3,7 @@ import sys
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout,
     QLabel, QTextEdit, QPushButton, QFileDialog, QHBoxLayout,
-    QDialog, QDialogButtonBox
+    QDialog, QDialogButtonBox, QCheckBox  # Added QCheckBox
 )
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QDragEnterEvent, QDropEvent
@@ -115,7 +115,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Script Prompter")
-        self.resize(600, 700)
+        self.resize(600, 750) # Increased height slightly for the new checkbox
 
         # Dictionary to store attached files: filename -> content.
         self.files = {}
@@ -124,9 +124,9 @@ class MainWindow(QMainWindow):
 
         # Default enriched prompt template.
         self.template = (
-            "### Scripts\n{scripts}\n\n"
             "### Context\n{context}\n\n"
-            "### Instructions\n{instructions}\n"
+            "### These are the scripts:\n{scripts}\n\n"
+            "### Instructions\n{instructions}"
         )
 
         central_widget = QWidget()
@@ -145,6 +145,10 @@ class MainWindow(QMainWindow):
         self.file_list_layout.setContentsMargins(0, 0, 0, 0)
         self.file_list_layout.setSpacing(5)
         main_layout.addWidget(self.file_list_container)
+
+        # Checkbox for line numbers
+        self.include_line_numbers_checkbox = QCheckBox("Include line numbers in scripts")
+        main_layout.addWidget(self.include_line_numbers_checkbox)
 
         # Text edit for user context.
         self.context_text = QTextEdit()
@@ -194,8 +198,15 @@ class MainWindow(QMainWindow):
 
     def build_scripts_text(self):
         scripts = ""
+        add_line_numbers = self.include_line_numbers_checkbox.isChecked()
         for filename, content in self.files.items():
-            scripts += f"{filename}:\n{content}\n\n"
+            processed_content = content
+            if add_line_numbers:
+                lines = content.splitlines()
+                numbered_lines = [f"{i+1}:{line}" for i, line in enumerate(lines)]
+                processed_content = "\n".join(numbered_lines)
+            
+            scripts += f"{filename}:\n{processed_content}\n\n"
         return scripts.strip()
 
     def copy_raw_context(self):
@@ -216,7 +227,17 @@ class MainWindow(QMainWindow):
         scripts_text = self.build_scripts_text()
         user_context = self.context_text.toPlainText()
         instructions = self.instructions_text.toPlainText()
-        enriched_prompt = self.template.format(
+
+        current_template = self.template
+        if self.include_line_numbers_checkbox.isChecked():
+            current_template = (
+                "### Context\n{context}\n\n"
+                "### These are the scripts:\n{scripts}\n\n"
+                "Note: Line numbers have been prepended to each line of the script(s) above for easy reference.\n\n"
+                "### Instructions\n{instructions}"
+            )
+
+        enriched_prompt = current_template.format(
             scripts=scripts_text if scripts_text else "(No scripts attached)",
             context=user_context if user_context else "(No user context provided)",
             instructions=instructions if instructions else "(No instructions provided)"
