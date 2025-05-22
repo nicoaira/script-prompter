@@ -2,8 +2,7 @@
 
 Script Prompter is a user-friendly GUI application designed to help you easily construct enriched prompts for large language models (LLMs). With its intuitive drag-and-drop interface, you can attach script files, add custom context and instructions, and generate a well-formatted prompt.
 
-<!-- Placeholder for Screenshot -->
-**[TODO: Insert Screenshot of the Application Interface Here]**
+![Screenshot from 2025-05-22 17-02-48](https://github.com/user-attachments/assets/69408412-d2f0-4038-afd8-8ba61ffba1b1)
 
 ## Features
 
