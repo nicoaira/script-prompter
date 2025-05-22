@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import sys
+import os  # Added import os
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout,
     QLabel, QTextEdit, QPushButton, QFileDialog, QHBoxLayout,
@@ -29,13 +30,13 @@ class DropArea(QLabel):
     def dropEvent(self, event: QDropEvent):
         urls = event.mimeData().urls()
         for url in urls:
-            file_path = url.toLocalFile()
+            file_path = url.toLocalFile()  # file_path is the full path
             try:
                 with open(file_path, 'r') as f:
                     content = f.read()
-                filename = file_path.split('/')[-1]
+                # Pass full file_path to callback
                 if self.file_added_callback:
-                    self.file_added_callback(filename, content)
+                    self.file_added_callback(file_path, content)
             except Exception as e:
                 print(f"Error reading {file_path}: {e}")
         event.acceptProposedAction()
@@ -43,13 +44,13 @@ class DropArea(QLabel):
     def mousePressEvent(self, event):
         file_paths, _ = QFileDialog.getOpenFileNames(self, "Select Files")
         if file_paths:
-            for file_path in file_paths:
+            for file_path in file_paths:  # file_path is the full path
                 try:
                     with open(file_path, 'r') as f:
                         content = f.read()
-                    filename = file_path.split('/')[-1]
+                    # Pass full file_path to callback
                     if self.file_added_callback:
-                        self.file_added_callback(filename, content)
+                        self.file_added_callback(file_path, content)
                 except Exception as e:
                     print(f"Error reading {file_path}: {e}")
 
@@ -58,16 +59,16 @@ class FileItemWidget(QWidget):
     A custom widget representing an attached file.
     Displays the filename with an "X" button on the right to delete it.
     """
-    def __init__(self, filename, delete_callback, parent=None):
+    def __init__(self, display_name, full_path, delete_callback, parent=None):  # Added full_path
         super(FileItemWidget, self).__init__(parent)
-        self.filename = filename
+        self.full_path = full_path  # Store full_path
         self.delete_callback = delete_callback
 
         layout = QHBoxLayout()
         layout.setContentsMargins(5, 2, 5, 2)
         layout.setSpacing(10)
 
-        self.label = QLabel(filename)
+        self.label = QLabel(display_name)  # display_name is basename
         layout.addWidget(self.label)
 
         self.delete_button = QPushButton("X")
@@ -78,7 +79,7 @@ class FileItemWidget(QWidget):
         self.setLayout(layout)
 
     def on_delete(self):
-        self.delete_callback(self.filename)
+        self.delete_callback(self.full_path)  # Pass full_path on delete
 
 class TemplateDialog(QDialog):
     """
@@ -115,11 +116,11 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Script Prompter")
-        self.resize(600, 750) # Increased height slightly for the new checkbox
+        self.resize(600, 800)  # Increased height for new checkbox
 
-        # Dictionary to store attached files: filename -> content.
+        # Dictionary to store attached files: full_path -> content.
         self.files = {}
-        # Dictionary to store file item widgets (for deletion).
+        # Dictionary to store file item widgets (for deletion): full_path -> widget.
         self.file_items = {}
 
         # Default enriched prompt template.
@@ -150,6 +151,10 @@ class MainWindow(QMainWindow):
         self.include_line_numbers_checkbox = QCheckBox("Include line numbers in scripts")
         main_layout.addWidget(self.include_line_numbers_checkbox)
 
+        # Checkbox for file tree
+        self.add_tree_checkbox = QCheckBox("Add file structure tree")
+        main_layout.addWidget(self.add_tree_checkbox)
+
         # Text edit for user context.
         self.context_text = QTextEdit()
         self.context_text.setPlaceholderText("Enter user context here (optional)...")
@@ -179,22 +184,111 @@ class MainWindow(QMainWindow):
         main_layout.addLayout(button_layout)
         central_widget.setLayout(main_layout)
 
-    def add_file(self, filename, content):
-        if filename in self.files:
+    def add_file(self, file_path, content):  # Changed first param to file_path
+        if file_path in self.files:
             return  # Optionally warn or update.
-        self.files[filename] = content
-        file_item = FileItemWidget(filename, self.delete_file)
+        
+        self.files[file_path] = content
+        display_name = os.path.basename(file_path)  # Get basename for display
+        file_item = FileItemWidget(display_name, file_path, self.delete_file)
         self.file_list_layout.addWidget(file_item)
-        self.file_items[filename] = file_item
+        self.file_items[file_path] = file_item
 
-    def delete_file(self, filename):
-        if filename in self.files:
-            del self.files[filename]
-        if filename in self.file_items:
-            widget = self.file_items[filename]
+    def delete_file(self, file_path):  # Changed param to file_path
+        if file_path in self.files:
+            del self.files[file_path]
+        if file_path in self.file_items:
+            widget = self.file_items[file_path]
             self.file_list_layout.removeWidget(widget)
             widget.deleteLater()
-            del self.file_items[filename]
+            del self.file_items[file_path]
+
+    def _generate_tree_lines_recursive(self, tree_dict, prefix=""):
+        lines = []
+        items = sorted(tree_dict.items())
+        for i, (name, content) in enumerate(items):
+            connector = "└── " if i == len(items) - 1 else "├── "
+            lines.append(f"{prefix}{connector}{name}")
+            if isinstance(content, dict):  # It's a directory
+                extension = "    " if i == len(items) - 1 else "│   "
+                lines.extend(self._generate_tree_lines_recursive(content, prefix + extension))
+        return lines
+
+    def build_file_tree_text(self):
+        paths = list(self.files.keys())
+        if not paths:
+            return "(No files attached to display in tree)"
+
+        normalized_paths = [os.path.normpath(p) for p in paths]
+
+        if len(normalized_paths) == 1:
+            return os.path.basename(normalized_paths[0])
+
+        # Build the hierarchical dictionary for the tree
+        # common_dir logic helps make the tree relative if there's a sensible common root.
+        common_dir = os.path.commonpath(normalized_paths)
+        
+        # Check if common_dir is a file itself or not a directory (e.g. common part of filenames)
+        # or if it's the filesystem root (which we might not want as an explicit single root in the tree).
+        is_fs_root = (common_dir == os.path.dirname(common_dir) and os.path.isdir(common_dir))
+
+        tree_dict_to_generate = {}
+        processed_for_tree_dict = False
+
+        if os.path.isdir(common_dir) and not is_fs_root and common_dir != ".":
+            # Common directory found, make tree relative to it, with common_dir's basename as root.
+            root_name = os.path.basename(common_dir)
+            relative_structure = {}
+            for p in sorted(normalized_paths):
+                if p == common_dir:  # Skip if a path is the common_dir itself for now
+                    continue 
+                try:
+                    rel_path = os.path.relpath(p, common_dir)
+                except ValueError:  # Should not happen if common_dir is truly common and p is under it
+                    rel_path = p  # Fallback
+                
+                parts = rel_path.split(os.sep)
+                curr = relative_structure
+                for part in parts[:-1]:
+                    curr = curr.setdefault(part, {})
+                if parts:  # Ensure parts is not empty
+                    curr[parts[-1]] = True  # Mark as file/endpoint
+            
+            tree_dict_to_generate = {root_name: relative_structure}
+            processed_for_tree_dict = True
+
+        if not processed_for_tree_dict:  # Fallback: Diverse paths or common_dir is root/'.'
+            # Build tree with potentially multiple roots from the paths themselves.
+            multi_root_structure = {}
+            for p in sorted(normalized_paths):
+                parts = p.split(os.sep)
+                # Handle leading '/' for absolute paths correctly
+                if parts[0] == '' and len(parts) > 1:  # e.g. /home/user -> ['', 'home', 'user']
+                    parts = parts[1:]
+                
+                curr = multi_root_structure
+                for part in parts[:-1]:
+                    curr = curr.setdefault(part, {})
+                if parts:
+                    curr[parts[-1]] = True
+            tree_dict_to_generate = multi_root_structure
+        
+        # Generate lines from the prepared dictionary
+        # The _generate_tree_lines_recursive expects a dict where keys are items at current level.
+        # If tree_dict_to_generate has one key (e.g. {root_name: content}), we want root_name printed first.
+        
+        final_tree_lines = []
+        sorted_top_level_items = sorted(tree_dict_to_generate.items())
+
+        for i, (top_name, top_content) in enumerate(sorted_top_level_items):
+            final_tree_lines.append(top_name)  # Print the top-level item name
+            if isinstance(top_content, dict):
+                 # Pass an initial prefix for children of this top-level item
+                 # If it's the last top-level item, its children's vertical bars shouldn't extend beyond it.
+                 # This detail is complex with current recursive helper. Simpler: always indent children.
+                final_tree_lines.extend(self._generate_tree_lines_recursive(top_content, ""))  # Children start with fresh connectors
+
+        return "\n".join(final_tree_lines)
 
     def build_scripts_text(self):
         scripts = ""
@@ -224,24 +318,36 @@ class MainWindow(QMainWindow):
         print("Raw context copied to clipboard.")
 
     def copy_enriched_prompt(self):
-        scripts_text = self.build_scripts_text()
+        scripts_text_built = self.build_scripts_text()
         user_context = self.context_text.toPlainText()
         instructions = self.instructions_text.toPlainText()
 
-        current_template = self.template
-        if self.include_line_numbers_checkbox.isChecked():
-            current_template = (
-                "### Context\n{context}\n\n"
-                "### These are the scripts:\n{scripts}\n\n"
-                "Note: Line numbers have been prepended to each line of the script(s) above for easy reference.\n\n"
-                "### Instructions\n{instructions}"
-            )
+        # Prepare arguments for formatting
+        format_args = {
+            "context": user_context if user_context else "(No user context provided)",
+            "instructions": instructions if instructions else "(No instructions provided)",
+            "scripts": scripts_text_built if scripts_text_built else "(No scripts attached)"
+        }
 
-        enriched_prompt = current_template.format(
-            scripts=scripts_text if scripts_text else "(No scripts attached)",
-            context=user_context if user_context else "(No user context provided)",
-            instructions=instructions if instructions else "(No instructions provided)"
-        )
+        # Build the prompt string part by part
+        prompt_parts = []
+        prompt_parts.append("### Context\n{context}\n")
+
+        if self.add_tree_checkbox.isChecked() and self.files:
+            file_tree_text = self.build_file_tree_text()
+            format_args["file_tree"] = file_tree_text
+            prompt_parts.append("### File Structure:\n{file_tree}\nNote: This tree shows the organization of the attached files.\n")
+
+        script_section = "### These are the scripts:\n{scripts}\n"
+        if self.include_line_numbers_checkbox.isChecked() and self.files:
+            script_section += "Note: Line numbers have been prepended to each line of the script(s) above for easy reference.\n"
+        prompt_parts.append(script_section)
+        
+        prompt_parts.append("### Instructions\n{instructions}")
+
+        final_template_str = "\n".join(prompt_parts)
+        enriched_prompt = final_template_str.format(**format_args)
+        
         QApplication.clipboard().setText(enriched_prompt)
         print("Enriched prompt copied to clipboard.")
 
